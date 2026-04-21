@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime   @default(now())
+  businesses   Business[]
+}
+
+model Business {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  address      String?
+  phone        String?
+  email        String?
+  vatNumber    String?
+  defaultTerms String?  @db.Text
+  createdAt    DateTime @default(now())
+  clients      Client[]
+  quotes       Quote[]
+}
+
+model Client {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name       String
+  email      String?
+  phone      String?
+  address    String?
+  company    String?
+  createdAt  DateTime @default(now())
+  quotes     Quote[]
+}
+
+model Quote {
+  id            String          @id @default(cuid())
+  businessId    String
+  business      Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  clientId      String
+  client        Client          @relation(fields: [clientId], references: [id])
+  quoteNumber   String
+  title         String
+  description   String?         @db.Text
+  scopeOfWork   String?         @db.Text
+  terms         String?         @db.Text
+  status        QuoteStatus     @default(DRAFT)
+  validUntil    DateTime?
+  subtotalPence Int             @default(0)
+  vatPence      Int             @default(0)
+  totalPence    Int             @default(0)
+  notes         String?         @db.Text
+  acceptToken   String          @unique @default(cuid())
+  sentAt        DateTime?
+  viewedAt      DateTime?
+  acceptedAt    DateTime?
+  acceptedByName String?
+  acceptedByIp  String?
+  declinedAt    DateTime?
+  declineReason String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  lineItems     QuoteLineItem[]
+  contract      Contract?
+}
+
+model QuoteLineItem {
+  id          String  @id @default(cuid())
+  quoteId     String
+  quote       Quote   @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Decimal @default(1)
+  unitPence   Int
+  vatRate     Decimal @default(0)
+  totalPence  Int
+  sortOrder   Int     @default(0)
+}
+
+model Contract {
+  id             String   @id @default(cuid())
+  quoteId        String   @unique
+  quote          Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  contractNumber String
+  formedAt       DateTime @default(now())
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  VIEWED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}

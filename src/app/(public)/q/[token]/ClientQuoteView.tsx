@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, BookCheck, Building2, Calendar } from "lucide-react";
-import type { QuoteStatus } from "@prisma/client";
+import type { QuoteStatus } from "@/generated/prisma/client";
 
 interface Props {
   quote: {

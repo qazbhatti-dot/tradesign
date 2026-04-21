@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Send, Trash2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import type { QuoteStatus } from "@prisma/client";
+import type { QuoteStatus } from "@/generated/prisma/client";
 
 interface Quote { id: string; status: QuoteStatus }
 

@@ -1,5 +1,5 @@
 import { Badge } from "./badge";
-import type { QuoteStatus } from "@prisma/client";
+import type { QuoteStatus } from "@/generated/prisma/client";
 
 const config: Record<QuoteStatus, { label: string; variant: "default" | "success" | "warning" | "destructive" | "outline" | "indigo" }> = {
   DRAFT:    { label: "Draft",    variant: "outline"     },

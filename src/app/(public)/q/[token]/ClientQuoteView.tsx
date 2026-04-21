@@ -13,9 +13,9 @@ interface Props {
   quote: {
     id: string; quoteNumber: string; title: string; description: string | null;
     scopeOfWork: string | null; terms: string | null; status: QuoteStatus;
-    validUntil: Date | null; subtotalPence: number; vatPence: number; totalPence: number;
-    acceptedByName: string | null; acceptedAt: Date | null;
-    contract: { contractNumber: string; formedAt: Date } | null;
+    validUntil: string | null; subtotalPence: number; vatPence: number; totalPence: number;
+    acceptedByName: string | null; acceptedAt: string | null;
+    contract: { contractNumber: string; formedAt: string } | null;
     client: { name: string };
     business: { name: string; email: string | null; phone: string | null; address: string | null };
     lineItems: { id: string; description: string; quantity: number; unitPence: number; vatRate: number; totalPence: number }[];
@@ -117,7 +117,7 @@ export function ClientQuoteView({ quote, token }: Props) {
             <div className="flex items-center gap-2 text-sm text-slate-400">
               <Calendar className="size-4 text-slate-600" />
               <div><p className="text-xs text-slate-600">Valid until</p>
-                <p className="text-white font-medium">{quote.validUntil ? quote.validUntil.toLocaleDateString("en-GB") : "No expiry"}</p></div>
+                <p className="text-white font-medium">{quote.validUntil ? new Date(quote.validUntil).toLocaleDateString("en-GB") : "No expiry"}</p></div>
             </div>
           </div>
           {quote.description && <p className="mt-4 text-sm text-slate-300 leading-relaxed">{quote.description}</p>}

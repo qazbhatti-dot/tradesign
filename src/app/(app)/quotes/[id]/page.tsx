@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { QuoteActions } from "./QuoteActions";
+import { CopyButton } from "./CopyButton";
 import { BookCheck, Calendar, User } from "lucide-react";
 
 export default async function QuoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -18,7 +19,18 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
   });
   if (!quote) notFound();
 
-  const clientLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/q/${quote.acceptToken}`;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
+  const clientLink = `${appUrl}/q/${quote.acceptToken}`;
+
+  // Serialise Decimal fields before passing to Client Components
+  const lineItems = quote.lineItems.map(li => ({
+    id: li.id,
+    description: li.description,
+    quantity: Number(li.quantity),
+    unitPence: li.unitPence,
+    vatRate: Number(li.vatRate),
+    totalPence: li.totalPence,
+  }));
 
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-6">
@@ -31,7 +43,8 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
           </div>
           <p className="text-sm text-slate-400">{quote.quoteNumber} · Created {quote.createdAt.toLocaleDateString("en-GB")}</p>
         </div>
-        <QuoteActions quote={quote} clientLink={clientLink} />
+        {/* Only pass plain serialisable fields */}
+        <QuoteActions quoteId={quote.id} status={quote.status} />
       </div>
 
       {/* Contract formed banner */}
@@ -47,7 +60,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
         </div>
       )}
 
-      {/* Meta */}
+      {/* Meta cards */}
       <div className="grid md:grid-cols-3 gap-4">
         {[
           { icon: <User className="size-4" />, label: "Client", value: quote.client.name, sub: quote.client.company || quote.client.email || "" },
@@ -86,12 +99,12 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.04]">
-            {quote.lineItems.map(li => (
+            {lineItems.map(li => (
               <tr key={li.id}>
                 <td className="px-5 py-3 text-slate-300">{li.description}</td>
-                <td className="px-3 py-3 text-right text-slate-400">{Number(li.quantity)}</td>
+                <td className="px-3 py-3 text-right text-slate-400">{li.quantity}</td>
                 <td className="px-3 py-3 text-right text-slate-400">{formatMoney(li.unitPence)}</td>
-                <td className="px-3 py-3 text-right text-slate-400">{Number(li.vatRate)}%</td>
+                <td className="px-3 py-3 text-right text-slate-400">{li.vatRate}%</td>
                 <td className="px-5 py-3 text-right font-medium text-white">{formatMoney(li.totalPence)}</td>
               </tr>
             ))}
@@ -132,17 +145,5 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
         </div>
       )}
     </div>
-  );
-}
-
-function CopyButton({ text }: { text: string }) {
-  "use client";
-  return (
-    <button
-      onClick={() => { navigator.clipboard.writeText(text); }}
-      className="text-xs text-indigo-400 hover:text-white border border-indigo-500/30 rounded-lg px-3 py-1.5 hover:bg-indigo-500/10 transition-colors whitespace-nowrap"
-    >
-      Copy link
-    </button>
   );
 }

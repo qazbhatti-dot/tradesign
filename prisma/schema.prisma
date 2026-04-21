@@ -71,8 +71,9 @@ model Quote {
   declineReason String?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  lineItems     QuoteLineItem[]
-  contract      Contract?
+  lineItems      QuoteLineItem[]
+  paymentStages  PaymentStage[]
+  contract       Contract?
 }
 
 model QuoteLineItem {
@@ -88,11 +89,25 @@ model QuoteLineItem {
 }
 
 model Contract {
-  id             String   @id @default(cuid())
-  quoteId        String   @unique
-  quote          Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  id             String    @id @default(cuid())
+  quoteId        String    @unique
+  quote          Quote     @relation(fields: [quoteId], references: [id], onDelete: Cascade)
   contractNumber String
-  formedAt       DateTime @default(now())
+  jobStatus      JobStatus @default(NOT_STARTED)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  formedAt       DateTime  @default(now())
+}
+
+model PaymentStage {
+  id          String    @id @default(cuid())
+  quoteId     String
+  quote       Quote     @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  description String
+  amountPence Int
+  dueDate     DateTime?
+  paidAt      DateTime?
+  sortOrder   Int       @default(0)
 }
 
 enum QuoteStatus {
@@ -102,4 +117,12 @@ enum QuoteStatus {
   ACCEPTED
   DECLINED
   EXPIRED
+}
+
+enum JobStatus {
+  NOT_STARTED
+  STARTED
+  IN_PROGRESS
+  SNAGGING
+  COMPLETE
 }

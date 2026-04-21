@@ -47,6 +47,20 @@ export default function LoginPage() {
           <Link href="/register" className="text-emerald-400 hover:underline">Create one free</Link>
         </p>
       </form>
+
+      <div className="mt-6 rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-4">
+        <p className="text-xs font-medium text-slate-500 mb-2">Demo account</p>
+        <div className="flex flex-col gap-1">
+          <button
+            type="button"
+            onClick={() => { setEmail("demo@tradesign.app"); setPassword("Demo1234!"); }}
+            className="text-left text-xs font-mono text-slate-400 hover:text-white transition-colors"
+          >
+            demo@tradesign.app
+          </button>
+          <span className="text-xs font-mono text-slate-500">Demo1234!</span>
+        </div>
+      </div>
     </div>
   );
 }
